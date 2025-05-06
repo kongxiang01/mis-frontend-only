@@ -114,6 +114,21 @@
   font-size: 1.2rem;
 }
 
+/* 添加菜单标签样式 */
+.menuLabel {
+  white-space: nowrap; /* 防止文字换行 */
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s, transform 0.3s;
+  overflow: hidden;
+}
+
+/* 非折叠状态下的菜单项样式 */
+.sider:not(.collapsed) .menuLabel {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 /* 内容区域样式 */
 .content {
   flex: 1;

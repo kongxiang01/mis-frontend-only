@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Layout.module.css';
 
@@ -52,7 +52,7 @@ const Layout = ({ children }) => {
                 className={`${styles.menuItem} ${location.pathname === item.path ? styles.active : ''}`}
               >
                 <span className={styles.menuIcon}>{item.icon}</span>
-                {!collapsed && <span className={styles.menuLabel}>{item.label}</span>}
+                <span className={styles.menuLabel}>{item.label}</span>
               </Link>
             ))}
           </nav>
