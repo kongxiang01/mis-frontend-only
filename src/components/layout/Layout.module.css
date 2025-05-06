@@ -1,0 +1,123 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 头部样式 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  background-color: #1e88e5;
+  color: white;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.collapseBtn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.userAvatar {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.logoutBtn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logoutBtn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 主容器样式 */
+.mainContainer {
+  display: flex;
+  flex: 1;
+}
+
+/* 侧边栏样式 */
+.sider {
+  width: 220px;
+  background-color: #f5f5f5;
+  transition: width 0.3s;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.sider.collapsed {
+  width: 60px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.menuItem:hover {
+  background-color: #e0e0e0;
+  text-decoration: none;
+}
+
+.menuItem.active {
+  background-color: #e3f2fd;
+  color: #1e88e5;
+  border-right: 3px solid #1e88e5;
+}
+
+.menuIcon {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* 内容区域样式 */
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9f9f9;
+  overflow-y: auto;
+}

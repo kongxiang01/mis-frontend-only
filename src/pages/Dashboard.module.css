@@ -1,0 +1,88 @@
+.dashboardPage {
+  padding: 10px;
+}
+
+.dashboardPage h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.dashboardStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.statCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.statIcon {
+  font-size: 2rem;
+  margin-right: 15px;
+}
+
+.statInfo h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.statInfo p {
+  margin: 5px 0 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.dashboardRecent {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboardRecent h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.recentItem {
+  display: flex;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.recentIcon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+}
+
+.recentContent h4 {
+  margin: 0;
+  color: #333;
+}
+
+.recentContent p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.recentTime {
+  font-size: 0.8rem;
+  color: #999;
+}
