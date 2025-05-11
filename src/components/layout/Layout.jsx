@@ -7,16 +7,17 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // 在 Layout.jsx 中修改 handleLogout 函数
   const handleLogout = () => {
+    if (window.confirm('是否同时清除本地存储的用户数据？')) {
+      localStorage.removeItem('users');
+    }
     localStorage.removeItem('isLoggedIn');
     navigate('/login');
   };
 
   const menuItems = [
     { path: '/users', label: '用户管理', icon: '👥' },
-    { path: '/info', label: '信息管理', icon: '📋' },
-    { path: '/visualization', label: '数据可视化', icon: '📈' },
-    { path: '/settings', label: '系统设置', icon: '⚙️' }
   ];
 
   return (

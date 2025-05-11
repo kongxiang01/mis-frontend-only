@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Users.module.css';
+import userService from '../services/userService';
 
 const Users = () => {
   // 用户数据状态
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   
   // 表单状态
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,17 +22,16 @@ const Users = () => {
     status: 'active'
   });
 
-  // 初始化模拟数据
+  // 初始化数据
   useEffect(() => {
-    const mockUsers = [
-      { id: '1', name: '张三', email: 'zhangsan@example.com', phone: '13800138001', department: '研发部', role: '开发工程师', status: 'active' },
-      { id: '2', name: '李四', email: 'lisi@example.com', phone: '13800138002', department: '市场部', role: '市场专员', status: 'active' },
-      { id: '3', name: '王五', email: 'wangwu@example.com', phone: '13800138003', department: '人事部', role: 'HR专员', status: 'inactive' },
-      { id: '4', name: '赵六', email: 'zhaoliu@example.com', phone: '13800138004', department: '财务部', role: '会计', status: 'active' },
-      { id: '5', name: '钱七', email: 'qianqi@example.com', phone: '13800138005', department: '研发部', role: '产品经理', status: 'active' },
-    ];
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
+    // 模拟 API 请求延迟
+    setLoading(true);
+    setTimeout(() => {
+      const fetchedUsers = userService.getUsers();
+      setUsers(fetchedUsers);
+      setFilteredUsers(fetchedUsers);
+      setLoading(false);
+    }, 500);
   }, []);
 
   // 搜索功能
@@ -83,43 +84,52 @@ const Users = () => {
   // 提交表单
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     
-    if (isEditing) {
-      // 更新现有用户
-      setUsers(users.map(user => 
-        user.id === currentUser.id ? currentUser : user
-      ));
-    } else {
-      // 添加新用户
-      const newUser = {
-        ...currentUser,
-        id: Date.now().toString()
-      };
-      setUsers([...users, newUser]);
-    }
-    
-    // 关闭模态框
-    setIsModalOpen(false);
+    setTimeout(() => {
+      if (isEditing) {
+        // 更新现有用户
+        userService.updateUser(currentUser);
+        setUsers(userService.getUsers());
+      } else {
+        // 添加新用户
+        userService.addUser(currentUser);
+        setUsers(userService.getUsers());
+      }
+      
+      // 关闭模态框
+      setIsModalOpen(false);
+      setLoading(false);
+    }, 300);
   };
 
   // 删除用户
   const handleDeleteUser = (id) => {
     if (window.confirm('确定要删除这个用户吗？')) {
-      setUsers(users.filter(user => user.id !== id));
+      setLoading(true);
+      setTimeout(() => {
+        userService.deleteUser(id);
+        setUsers(userService.getUsers());
+        setLoading(false);
+      }, 300);
     }
   };
 
   // 切换用户状态
   const handleToggleStatus = (id) => {
-    setUsers(users.map(user => {
-      if (user.id === id) {
-        return {
-          ...user,
-          status: user.status === 'active' ? 'inactive' : 'active'
+    setLoading(true);
+    setTimeout(() => {
+      const userToUpdate = users.find(user => user.id === id);
+      if (userToUpdate) {
+        const updatedUser = {
+          ...userToUpdate,
+          status: userToUpdate.status === 'active' ? 'inactive' : 'active'
         };
+        userService.updateUser(updatedUser);
+        setUsers(userService.getUsers());
       }
-      return user;
-    }));
+      setLoading(false);
+    }, 300);
   };
 
   return (
@@ -144,63 +154,67 @@ const Users = () => {
       </div>
 
       <div className={styles.userTable}>
-        <table>
-          <thead>
-            <tr>
-              <th>姓名</th>
-              <th>邮箱</th>
-              <th>电话</th>
-              <th>部门</th>
-              <th>职位</th>
-              <th>状态</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map(user => (
-                <tr key={user.id} className={user.status === 'inactive' ? styles.inactiveRow : ''}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.department}</td>
-                  <td>{user.role}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${styles[user.status]}`}>
-                      {user.status === 'active' ? '在职' : '离职'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={styles.actionButtons}>
-                      <button 
-                        className={styles.editButton} 
-                        onClick={() => handleEditUser(user)}
-                      >
-                        编辑
-                      </button>
-                      <button 
-                        className={styles.statusButton} 
-                        onClick={() => handleToggleStatus(user.id)}
-                      >
-                        {user.status === 'active' ? '设为离职' : '设为在职'}
-                      </button>
-                      <button 
-                        className={styles.deleteButton} 
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        删除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
+        {loading ? (
+          <div className={styles.loading}>加载中...</div>
+        ) : (
+          <table>
+            <thead>
               <tr>
-                <td colSpan="7" className={styles.noData}>没有找到匹配的用户</td>
+                <th>姓名</th>
+                <th>邮箱</th>
+                <th>电话</th>
+                <th>部门</th>
+                <th>职位</th>
+                <th>状态</th>
+                <th>操作</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map(user => (
+                  <tr key={user.id} className={user.status === 'inactive' ? styles.inactiveRow : ''}>
+                    <td>{user.name}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone}</td>
+                    <td>{user.department}</td>
+                    <td>{user.role}</td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${styles[user.status]}`}>
+                        {user.status === 'active' ? '在职' : '离职'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className={styles.actionButtons}>
+                        <button 
+                          className={styles.editButton} 
+                          onClick={() => handleEditUser(user)}
+                        >
+                          编辑
+                        </button>
+                        <button 
+                          className={styles.statusButton} 
+                          onClick={() => handleToggleStatus(user.id)}
+                        >
+                          {user.status === 'active' ? '设为离职' : '设为在职'}
+                        </button>
+                        <button 
+                          className={styles.deleteButton} 
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className={styles.noData}>没有找到匹配的用户</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {isModalOpen && (
@@ -216,6 +230,7 @@ const Users = () => {
               </button>
             </div>
             <form onSubmit={handleSubmit} className={styles.userForm}>
+              {/* 表单内容保持不变 */}
               <div className={styles.formGroup}>
                 <label htmlFor="name">姓名</label>
                 <input
@@ -300,6 +315,7 @@ const Users = () => {
                 <button 
                   type="submit" 
                   className={styles.submitButton}
+                  disabled={loading}
                 >
                   {isEditing ? '保存' : '添加'}
                 </button>
