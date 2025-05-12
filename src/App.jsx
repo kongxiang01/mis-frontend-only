@@ -2,7 +2,7 @@ import './App.css';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Layout from './components/layout/Layout';
-import Users from './pages/Users'; // 导入新的 Users 组件
+import Users from './pages/Users';
 
 // 受保护的路由组件
 const ProtectedRoute = ({ children }) => {

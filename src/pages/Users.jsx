@@ -9,6 +9,9 @@ const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   
+  // 选中用户状态
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  
   // 表单状态
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -43,6 +46,8 @@ const Users = () => {
       user.role.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(results);
+    // 重置选中状态
+    setSelectedUsers([]);
   }, [searchTerm, users]);
 
   // 处理搜索输入
@@ -105,7 +110,11 @@ const Users = () => {
 
   // 删除用户
   const handleDeleteUser = (id) => {
-    if (window.confirm('确定要删除这个用户吗？')) {
+    // 查找要删除的用户，获取其名字
+    const userToDelete = users.find(user => user.id === id);
+    if (!userToDelete) return;
+    
+    if (window.confirm(`确定要删除用户 "${userToDelete.name}" 吗？此操作不可恢复。`)) {
       setLoading(true);
       setTimeout(() => {
         userService.deleteUser(id);
@@ -131,6 +140,52 @@ const Users = () => {
       setLoading(false);
     }, 300);
   };
+  
+  // 处理选择单个用户
+  const handleSelectUser = (userId) => {
+    setSelectedUsers(prev => {
+      if (prev.includes(userId)) {
+        return prev.filter(id => id !== userId);
+      } else {
+        return [...prev, userId];
+      }
+    });
+  };
+  
+  // 处理全选/取消全选
+  const handleSelectAll = () => {
+    if (selectedUsers.length === filteredUsers.length) {
+      // 如果已全选，则取消全选
+      setSelectedUsers([]);
+    } else {
+      // 否则全选
+      setSelectedUsers(filteredUsers.map(user => user.id));
+    }
+  };
+  
+  // 批量删除用户
+  const handleBatchDelete = () => {
+    if (selectedUsers.length === 0) {
+      alert('请先选择要删除的用户');
+      return;
+    }
+    
+    if (window.confirm(`确定要删除选中的 ${selectedUsers.length} 个用户吗？此操作不可恢复。`)) {
+      setLoading(true);
+      setTimeout(() => {
+        // 逐个删除选中的用户
+        selectedUsers.forEach(id => {
+          userService.deleteUser(id);
+        });
+        
+        // 更新用户列表
+        setUsers(userService.getUsers());
+        // 清空选中状态
+        setSelectedUsers([]);
+        setLoading(false);
+      }, 500);
+    }
+  };
 
   return (
     <div className={styles.usersPage}>
@@ -152,6 +207,19 @@ const Users = () => {
           </button>
         </div>
       </div>
+      
+      {/* 添加批量操作区域 */}
+      {selectedUsers.length > 0 && (
+        <div className={styles.batchActions}>
+          <span>已选择 {selectedUsers.length} 项</span>
+          <button 
+            className={styles.batchDeleteButton} 
+            onClick={handleBatchDelete}
+          >
+            批量删除
+          </button>
+        </div>
+      )}
 
       <div className={styles.userTable}>
         {loading ? (
@@ -160,6 +228,13 @@ const Users = () => {
           <table>
             <thead>
               <tr>
+                <th className={styles.checkboxCell}>
+                  <input 
+                    type="checkbox" 
+                    checked={filteredUsers.length > 0 && selectedUsers.length === filteredUsers.length}
+                    onChange={handleSelectAll}
+                  />
+                </th>
                 <th>姓名</th>
                 <th>邮箱</th>
                 <th>电话</th>
@@ -173,6 +248,13 @@ const Users = () => {
               {filteredUsers.length > 0 ? (
                 filteredUsers.map(user => (
                   <tr key={user.id} className={user.status === 'inactive' ? styles.inactiveRow : ''}>
+                    <td className={styles.checkboxCell}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedUsers.includes(user.id)}
+                        onChange={() => handleSelectUser(user.id)}
+                      />
+                    </td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.phone}</td>
@@ -209,7 +291,7 @@ const Users = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className={styles.noData}>没有找到匹配的用户</td>
+                  <td colSpan="8" className={styles.noData}>没有找到匹配的用户</td>
                 </tr>
               )}
             </tbody>
